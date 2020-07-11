@@ -1,0 +1,107 @@
+enum InstitusjonsType {
+  ungdomsskole
+  vgs
+  annen
+}
+
+type Category @model # (subscriptions: { level: off }) #public
+  @auth(rules: [
+    # { allow: public, operations: [read, create] }
+     # se: https://aws-amplify.github.io/docs/cli-toolchain/graphql#public-authorization
+    { allow: public, provider: apiKey }
+    # { allow: public, provider: iam },
+    { allow: groups, groups: ["Admin"], operations: [create, update, delete, read] },
+  ])
+  @key (name: "byRank", fields: ["slug", "rank"], queryField: "listCategoryByRank")
+{
+  id: ID!
+  rank: Int!
+  name: String!
+  slug: String!
+  type: String!
+  videos: [Video] @connection(keyName: "byCategory", fields: ["id"])
+}
+
+type Video @model #@searchable
+  @auth(rules: [
+    { allow: public, provider: apiKey },
+    # { allow: public, operations: [read] },
+    { allow: groups, groups: ["Admin"], operations: [create, update, delete, read] } # provider: userPools
+  ])
+  @key(name: "byCategory", fields: ["categoryId"], queryField: "VideoByCategoryId")
+  @key(name: "bySlug", fields: ["slug"], queryField: "VideoBySlug")
+{
+  id: ID!,
+  categoryId: ID!
+  awsId: ID
+  title: String!
+  slug: String!
+  createdAt: AWSDateTime
+  posterTime: Float!
+  published: Boolean!
+  fileName: String!
+  type: String!
+  category: Category @connection(fields: ["categoryId"])
+  chapters: [Chapter] @connection(keyName: "byVideo", fields: ["id"]) # @auth(rules: [{ allow: public, provider: iam, operations: [read] }])
+}
+
+type Chapter @model
+  @auth(rules: [
+    { allow: public, provider: apiKey },
+    # { allow: public, provider: iam, operations: [read, create] },
+    { allow: groups, groups: ["Admin"], operations: [create, update, delete, read] }, # provider: userPools
+  ])
+  @key(name: "byVideo", fields: ["videoId", "start"])
+{
+  id: ID!
+  videoId: ID!
+  title: String!
+  start: Float!
+  posterTime: Float!
+  video: Video @connection(fields: ["videoId"])
+}
+
+type License @model # (subscriptions: { level: off }) # @searchable
+  @auth(rules: [
+    { allow: public, provider: apiKey },
+    { allow: public, provider: iam, operations: [read] }
+    # allow: groups, groups: ["Admin"], operations: [create, update, delete, read] }
+    # { allow: private, operations: [read,create] }
+  ])
+{
+  id: ID! # @auth(rules: [ {allow: public, provider: iam, operations: [read]} ])
+  innehaver: String # bedre med eier
+  gyldigFraDato: AWSDate
+  aktiv: Boolean
+  ressursnummer: String
+  institusjonsType: InstitusjonsType
+  bestiller: String # @auth(rules: [ { allow: groups, groups: ["Admin"]} ]) # Virker men ikke online
+  bestillersEpost: AWSEmail # @auth(rules: [ { allow: groups, groups: ["Admin"]} ]) # Virker
+  adresse: String
+  postnummer: Int
+  sted: String
+  brukerantall: Int
+  betalt: Boolean # @auth(rules: [ { allow: groups, groups: ["Admin"]} ]) # Virker
+  managers: [Manager] @connection(name: "LicenseManagers", sortField: "name", limit: 20)
+}
+
+type Manager @model # @searchable
+  @auth(rules: [
+    { allow: public, provider: apiKey },
+    # { allow: public, provider: iam, operations: [read, create] }
+    { allow: groups, groups: ["Admin"], operations: [create, update, delete, read] }
+  ])
+{
+  id: ID!
+  name: String!
+  email: AWSEmail!
+  license: License @connection(name: "LicenseManagers")
+}
+
+# type Mutation @model
+#   @auth(rules: [ { allow: public, provider: iam, operations: [create, update, delete, read] } ])
+# {
+#   # used internally to trigger the subscription
+#   test(value: String!): String
+#   @aws_iam
+# }

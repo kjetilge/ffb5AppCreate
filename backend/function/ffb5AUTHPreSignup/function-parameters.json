@@ -1,0 +1,15 @@
+{
+  "trigger": true,
+  "modules": [
+    "custom"
+  ],
+  "parentResource": "ffb5AUTH",
+  "functionName": "ffb5AUTHPreSignup",
+  "resourceName": "ffb5AUTHPreSignup",
+  "parentStack": "auth",
+  "triggerEnvs": [],
+  "triggerDir": "/Users/kjetilge/.nvm/versions/node/v10.17.0/lib/node_modules/@aws-amplify/cli/node_modules/amplify-category-auth/provider-utils/awscloudformation/utils/../triggers/PreSignup",
+  "triggerTemplate": "PreSignup.json.ejs",
+  "roleName": "ffb5AUTHPreSignup",
+  "skipEdit": true
+}

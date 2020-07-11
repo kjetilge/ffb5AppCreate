@@ -1,0 +1,9 @@
+{
+  "request": {
+    "userAttributes": {
+      "email": "kjetil@domain.com",
+      "zoneinfo": "zxcv"
+    }
+  },
+  "response": {}
+}

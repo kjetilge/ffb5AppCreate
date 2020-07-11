@@ -1,0 +1,11 @@
+{
+  "name": "fagfilm-backend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "aws-sdk": "^2.702.0",
+    "axios": "^0.19.2",
+    "graphql": "^15.3.0",
+    "graphql-tag": "^2.10.4",
+  }
+}
